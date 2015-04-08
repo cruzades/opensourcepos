@@ -78,9 +78,19 @@ class Receiving_lib
     	return $this->CI->session->userdata('recv_invoice_number');
     }
     
+    function get_receiving_id()
+    {
+    	return $this->CI->session->userdata('receiving_id');
+    }
+    
     function set_invoice_number($invoice_number)
     {
     	$this->CI->session->set_userdata('recv_invoice_number', $invoice_number);
+    }
+    
+    function set_receiving_id($receiving_id)
+    {
+    	$this->CI->session->set_userdata('receiving_id', $receiving_id);
     }
     
     function clear_invoice_number()
@@ -358,7 +368,12 @@ class Receiving_lib
 	{
 		$this->CI->session->unset_userdata('receiving_mode');
 	}
-
+	
+	function clear_receiving_id()
+	{
+		$this->CI->session->unset_userdata('receiving_id');
+	}
+	
 	function clear_all()
 	{
 		$this->clear_mode();
@@ -366,6 +381,7 @@ class Receiving_lib
 		$this->delete_supplier();
 		$this->clear_comment();
 		$this->clear_invoice_number();
+		$this->clear_receiving_id();
 	}
 	
 	function get_item_total($quantity, $price, $discount_percentage)

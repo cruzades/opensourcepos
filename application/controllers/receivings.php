@@ -78,11 +78,18 @@ class Receivings extends Secure_area
 		$data=array();
 		$mode = $this->receiving_lib->get_mode();
 		$item_id_or_number_or_item_kit_or_receipt = $this->input->post("item");
-		$quantity = ($mode=="receive" or $mode=="requisition") ? 1:-1;
+		$quantity = ($mode=="receive" or $mode=="requisition" or $mode=="edit") ? 1:-1;
 		$item_location = $this->receiving_lib->get_stock_source();
 		if($mode=='return' && $this->receiving_lib->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt))
 		{
 			$this->receiving_lib->return_entire_receiving($item_id_or_number_or_item_kit_or_receipt);
+		}
+		elseif($mode=='edit' && $this->receiving_lib->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt))
+		{
+			$pieces = explode(' ', $item_id_or_number_or_item_kit_or_receipt);
+			$this->receiving_lib->copy_entire_receiving($pieces[1]);
+			$cart = $this->receiving_lib->get_cart();
+			$this->receiving_lib->set_receiving_id($pieces[1]);
 		}
 		elseif($this->receiving_lib->is_valid_item_kit($item_id_or_number_or_item_kit_or_receipt))
 		{
@@ -215,7 +222,8 @@ class Receivings extends Secure_area
 			$data['invoice_number']=$invoice_number;
 			$data['payment_type']=$this->input->post('payment_type');
 			//SAVE receiving to database
-			$data['receiving_id']='RECV '.$this->Receiving->save($data['cart'], $supplier_id,$employee_id,$comment,$invoice_number,$payment_type,$data['stock_location']);
+			$receiving_id = $this->receiving_lib->get_receiving_id();
+			$data['receiving_id']='RECV '.$this->Receiving->save($data['cart'], $supplier_id,$employee_id,$comment,$invoice_number,$payment_type,$receiving_id);
 			
 			if ($data['receiving_id'] == 'RECV -1')
 			{
@@ -334,7 +342,7 @@ class Receivings extends Secure_area
 	{
 		$person_info = $this->Employee->get_logged_in_employee_info();
 		$data['cart']=$this->receiving_lib->get_cart();
-		$data['modes']=array('receive'=>$this->lang->line('recvs_receiving'),'return'=>$this->lang->line('recvs_return'));
+		$data['modes']=array('receive'=>$this->lang->line('recvs_receiving'),'return'=>$this->lang->line('recvs_return'),'edit'=>$this->lang->line('recvs_edit'));
 		$data['mode']=$this->receiving_lib->get_mode();
 		
 		$data['stock_locations']=$this->Stock_locations->get_allowed_locations('receivings');
