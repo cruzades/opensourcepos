@@ -251,8 +251,13 @@ class Receiving_lib
 
 		return false;
 	}
+	
+	function is_valid_invoice($invoice_number)
+	{
+		return $this->CI->Receiving->get_receiving_by_invoice_number($receipt_receiving_id)->num_rows() > 0;
+	}
     
-	function is_valid_receipt($receipt_receiving_id)
+	function is_valid_receipt($receipt_receiving_id,$check_invoice_number=TRUE)
 	{
 		//RECV #
 		$pieces = explode(' ',$receipt_receiving_id);
@@ -261,9 +266,9 @@ class Receiving_lib
 		{
 			return $this->CI->Receiving->exists($pieces[1]);
 		}
-		else 
+		else if ($check_invoice_number) 
 		{
-			return $this->CI->Receiving->get_receiving_by_invoice_number($receipt_receiving_id)->num_rows() > 0;
+			return $this->is_valid_invoice($pieces[1]);
 		}
 
 		return false;

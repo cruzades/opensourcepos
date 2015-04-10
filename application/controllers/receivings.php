@@ -83,7 +83,7 @@ class Receivings extends Secure_area
 		{
 			$this->receiving_lib->return_entire_receiving($item_id_or_number_or_item_kit_or_receipt);
 		}
-		elseif($mode=='edit' && $this->receiving_lib->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt))
+		elseif($mode=='edit' && $this->receiving_lib->is_valid_receipt($item_id_or_number_or_item_kit_or_receipt,FALSE))
 		{
 			$pieces = explode(' ', $item_id_or_number_or_item_kit_or_receipt);
 			$this->receiving_lib->copy_entire_receiving($pieces[1]);
@@ -196,6 +196,8 @@ class Receivings extends Secure_area
 		$comment = $this->input->post('comment');
 		$emp_info=$this->Employee->get_info($employee_id);
 		$payment_type=$this->input->post('payment_type');
+		// will be set in case we want to edit
+		$receiving_id = $this->receiving_lib->get_receiving_id();
         $data['stock_location']=$this->receiving_lib->get_stock_source();
 		if ($this->input->post('amount_tendered'))
 		{
@@ -210,7 +212,7 @@ class Receivings extends Secure_area
 			$data['supplier']=$suppl_info->company_name;  //   first_name.' '.$suppl_info->last_name;
 		}
 		$invoice_number=$this->_substitute_invoice_number($suppl_info);
-		if ($this->receiving_lib->is_invoice_number_enabled() && $this->Receiving->invoice_number_exists($invoice_number))
+		if ($this->receiving_lib->is_invoice_number_enabled() && $this->Receiving->invoice_number_exists($invoice_number,$receiving_id))
 		{
 			$data['error']=$this->lang->line('recvs_invoice_number_duplicate');
 			$this->_reload($data);
@@ -221,7 +223,6 @@ class Receivings extends Secure_area
 			$data['invoice_number']=$invoice_number;
 			$data['payment_type']=$this->input->post('payment_type');
 			//SAVE receiving to database
-			$receiving_id = $this->receiving_lib->get_receiving_id();
 			$data['receiving_id']='RECV '.$this->Receiving->save($data['cart'], $supplier_id,$employee_id,$comment,$invoice_number,$payment_type,$receiving_id);
 			
 			if ($data['receiving_id'] == 'RECV -1')
