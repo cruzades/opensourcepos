@@ -8,7 +8,7 @@ class Receivings extends Secure_area
 		$this->load->library('receiving_lib');
 		$this->load->library('barcode_lib');
 	}
-
+Feel
 	function index()
 	{
 		$this->_reload();
@@ -213,7 +213,7 @@ class Receivings extends Secure_area
 			$data['supplier']=$suppl_info->company_name;  //   first_name.' '.$suppl_info->last_name;
 		}
 		$invoice_number=$this->_substitute_invoice_number($suppl_info);
-		if ($this->receiving_lib->is_invoice_number_enabled() && $this->Receiving->invoice_number_exists($invoice_number,$receiving_id))
+		if ($data['mode'] == 'receive' && $this->receiving_lib->is_invoice_number_enabled() && $this->Receiving->invoice_number_exists($invoice_number,$receiving_id))
 		{
 			$data['error']=$this->lang->line('recvs_invoice_number_duplicate');
 			$this->_reload($data);
