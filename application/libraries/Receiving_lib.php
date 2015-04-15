@@ -100,8 +100,8 @@ class Receiving_lib
     
     function is_invoice_number_enabled()
     {
-    	return $this->CI->session->userdata('recv_invoice_number_enabled') == 'true' ||
-    	$this->CI->session->userdata('recv_invoice_number_enabled') == '1';
+    	return $this->get_mode() == 'receive' && ($this->CI->session->userdata('recv_invoice_number_enabled') == 'true' ||
+    	$this->CI->session->userdata('recv_invoice_number_enabled') == '1');
     }
     
     function set_invoice_number_enabled($invoice_number_enabled)
@@ -254,7 +254,7 @@ class Receiving_lib
 	
 	function is_valid_invoice($invoice_number)
 	{
-		return $this->CI->Receiving->get_receiving_by_invoice_number($receipt_receiving_id)->num_rows() > 0;
+		return $this->CI->Receiving->get_receiving_by_invoice_number($invoice_number)->num_rows() > 0;
 	}
     
 	function is_valid_receipt($receipt_receiving_id,$check_invoice_number=TRUE)
@@ -268,7 +268,7 @@ class Receiving_lib
 		}
 		else if ($check_invoice_number) 
 		{
-			return $this->is_valid_invoice($pieces[1]);
+			return $this->is_valid_invoice($receipt_receiving_id);
 		}
 
 		return false;
